@@ -25,18 +25,29 @@ jobs:
     - name: Compile PDF with latexmk
       run: |
         latexmk -pdf -interaction=nonstopmode -output-directory=out main.tex
-
+    
+    - name: Compress PDF
+      run: |
+        gs -sDEVICE=pdfwrite -dCompatibilityLevel=1.4 -dPDFSETTINGS=/ebook -dNOPAUSE -dQUIET -dBATCH -sOutputFile=compressed.pdf out/main.pdf
+        mv compressed.pdf compiled-cv.pdf
+    
     - name: Upload PDF
       uses: actions/upload-artifact@v4
       with:
         name: compiled-pdf
         path: out/main.pdf
-        
+
+    - name: Set up Git LFS
+      run: |
+        git lfs install
+        git lfs track "*.pdf"
+        git add .gitattributes
+    
     - name: Commit PDF to repo
       run: |
         git config --global user.name 'github-actions[bot]'
         git config --global user.email 'github-actions[bot]@users.noreply.github.com'
         cp out/main.pdf compiled-cv.pdf
         git add compiled-cv.pdf
-        git commit -m "Add compiled CV PDF [auto]" || echo "No changes to commit"
-        git push https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git
+        git commit -m "Add compiled CV PDF [auto]"
+        git push origin main
