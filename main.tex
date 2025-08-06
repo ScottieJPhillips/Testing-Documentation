@@ -1,0 +1,901 @@
+\documentclass[12pt]{article}
+\usepackage[english]{babel}
+\usepackage[utf-8]{inputenc}  %%latin1
+\usepackage{fullpage}
+\usepackage{verbatim}
+\usepackage{pgffor}
+\usepackage{amsmath}
+\usepackage{float}
+\usepackage[usenames,dvipsnames]{xcolor}
+\usepackage{hyperref}
+\hypersetup{
+    colorlinks=true,
+    linkcolor=orange!50!black,
+    filecolor=magenta,      
+    urlcolor=cyan,
+    pdftitle={Overleaf Example},
+    pdfpagemode=FullScreen,
+    }
+\usepackage{graphicx}		%% to insert pics
+\usepackage{listings}
+\usepackage{color}
+
+\title{Pixel Module Testing}
+\author{SCIPP Modules}
+
+\definecolor{mygreen}{rgb}{0,0.6,0}
+\definecolor{mygray}{rgb}{0.5,0.5,0.5}
+\definecolor{mymauve}{rgb}{0.58,0,0.82}
+
+\lstset{ %
+  backgroundcolor=\color{white},   % choose the background color
+  basicstyle=\footnotesize,        % size of fonts used for the code
+  breaklines=true,                 % automatic line breaking only at whitespace
+  captionpos=b,                    % sets the caption-position to bottom
+  commentstyle=\color{mygreen},    % comment style
+  escapeinside={\%*}{*)},          % if you want to add LaTeX within your code
+  keywordstyle=\color{blue},       % keyword style
+  stringstyle=\color{mymauve},     % string literal style
+}
+
+\begin{document}
+
+\maketitle
+This guide outlines the reception, inspection, handling, and testing procedures used for pixel modules at SCIPP. It is intended for internal use by the SCIPP modules team to ensure safe and standardized testing protocols. This document is version controlled and exists in the 
+\newpage
+\tableofcontents
+\newpage 
+%%%%% Change multivisor processes to TUI or command line process.
+%%% add level 1 and 2 to lid references 
+%%% add commands section so that you can say to just turn on lv or chiller anf they 
+%% test passing does npt matter, always upload
+\section{Module Reception}
+\label{sec:recieve}
+
+Before anything is done, the module information must be pulled from the production database into the local database. This will need to be done by a grad student or postdoc that has access to the production database. 
+
+Module reception will require the following PPE to be work on top of the standard cleanroom PPE. 
+\begin{itemize}
+    \item ESD Bracelet
+    \item Gloves
+\end{itemize}
+The ESD bracelet and cord can be found in the drawer shown in Fig \ref{fig:ESD-Drawer}. The bracelet must be touching skin when worn and plugged into the green plug on the bottom side of the lab bench table, an example of this is shown in Fig \ref{fig:esd-example}.
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.5\linewidth]{Figures/ESD_drawer.jpg}
+    \caption{ESD Drawer.}
+    \label{fig:ESD-Drawer}
+\end{figure}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.5\linewidth]{Figures/ESD-Example.png}
+    \caption{Example of a properly worn ESD bracelet.}
+    \label{fig:esd-example}
+\end{figure}
+
+The module should come in a pelican case shown closed in Fig \ref{fig:pelican-closed} and open in Fig \ref{fig:pelican-open}.
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.5\linewidth]{Figures/pelican_closed.jpg}
+    \caption{Closed pelican case}
+    \label{fig:pelican-closed}
+\end{figure}
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.5\linewidth]{Figures/pelican_open.jpg}
+    \caption{Open pelican case}
+    \label{fig:pelican-open}
+\end{figure}
+There can be multiple modules in a single delivery and the next steps will be repeated for each module. 
+\subsection{Reception Checklist}
+\begin{itemize}
+\item Check \hyperref[https://itkpix-srv.ucsc.edu/localdb/components?view=module]{localdb}. for module, if it is not there, ask an expert to pull from ITkPD.
+\item Cut electrostatic discharge (ESD) bag and check that the module matches the serial number put in dry air cabinet %% take pic later when changes are made
+
+\item Check in local db that the current stage of the module is MODULE/POST\_PARYLENE\_WARM
+\end{itemize}
+
+\newpage
+\section{Visual Inspection}
+\label{sec:vis-inspect}
+
+The purpose of the visual inspection is to ensure that the chip is not damaged.
+Visual inspection will require the following PPE to be worn on top of the standard cleanroom PPE. 
+\begin{itemize}
+    \item ESD Bracelet
+    \item Gloves
+\end{itemize}
+
+
+In Fig \ref{fig:visinspect} the setup we have for visual inspection. The green plastic holder under the camera is used to hold the module when inspecting it.
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.5\linewidth]{Figures/visinspect.jpg}
+    \caption{Visual Inspection Stand}
+    \label{fig:visinspect}
+\end{figure}
+
+
+\begin{itemize}
+    \item Take the module out of the dry air cabinet in the received section. 
+    \item Carefully take the cover off the top of the module by unscrewing the screws that hold down the plastic cover, placing the cover upside down so that the foam pieces are not in contact with anything and then placing the module inside the green 3d printed carrier used for imaging the front side, this can be seen in Fig \ref{fig:front-side}.
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.5\linewidth]{Figures/front_side.png}
+    \caption{Frontside orientation for visual inspection.}
+    \label{fig:front-side}
+\end{figure}
+    
+    \item Once in the carrier and set below the camera inside of the blue carrier holder. Make sure that the orientaton of the chips is the same as in Fig \ref{fig:front-side} with GA1 at the top left. 
+    \item Turn the camera on by switching the camera to on at the top of it. Turn the lights on by flipping their switches that are on the wall. 
+
+    \item on daq05 terminal run the following script in the monitoring/visual\_inspection folder. This will open a graphic user interface that you will use to capure images of the module. 
+\begin{verbatim}
+venv/bin/python get_image.py
+\end{verbatim}
+
+    \item Change the focus on the camera and in the visual inspection user interface change the zoom to make sure that the wirebonds are in focus when zoomed in. 
+
+Note that the script that is ran is a non electric test and more information about submitting non-electrical QC tests of ITkPix modules can be found in the \href{https://pypi.org/project/module-qc-nonelec-gui/}{module-qc-non-elec-gui documentation}.
+
+    \item Add the module ID and select front side of the module and capture the image by hitting the button in user interface.
+    
+    \item Carefully place the module cover back on and screw in the holding screws. 
+    \item Take the module out of the front side carrier and take the backside cover screws off. 
+    \item Carefully lift the module off of the base plate and place upside down inside of the green holder shown in Fig \ref{fig:back-side}.  
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.5\linewidth]{Figures/module_backside.png}
+    \caption{Backside orientation for visual inspection.}
+    \label{fig:back-side}
+\end{figure}
+
+    \item Turn the camera on and then off again.  
+    \item Change the focus on the camera and in the visual inspection user interface change the zoom to make sure that the wirebonds are in focus when zoomed in. 
+    \item Select back side and capture the image. 
+    \item Place the module back onto the base plate and screw it in. 
+    \item Turn the camera and lights off and then place the module in the dry air cabinet in the visual inspection shelf.
+\end{itemize}
+
+\newpage
+\section{Placing Module into Enclosure}
+\label{sec:enclosure}
+\textbf{PPE REQUIRED}
+\begin{itemize}
+    \item ESD Bracelet
+    \item Gloves
+\end{itemize}
+
+Before starting this process, make sure no on else is using setup that you are trying to use. 
+
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.5\linewidth]{Figures/enclosure.jpg}
+    \caption{Acrylic enclosure for module testing.}
+    \label{fig:enclosure}
+\end{figure}
+
+Take the module outside of the visual inspection area of the dry air cabinet. If it is in the received and not in the visual inspection then it may not have been visually inspected yet or placed in the wrong part of the dry air cabinet.  
+\begin{itemize}
+    \item Take off the level one and level two lids and remove the lid to the foam box. 
+    \item Use a small amount of isopropyl alcohol (IPA) on a cotton tipped applicators that you can find by the sink to wipe down the vacuum chuck.
+    \item Take the base plate off of the module and place it on the vacuum chuck, make sure there is full contact between the chuck and module and make sure that it is oriented correctly so that the pigtails can be plugged in, see Fig \ref{fig:module-in-foam}. 
+    \item Push down on the center of the module and simultaneously turn on the vacuum and make sure the pressure is above 70 kPa. The vacuum is off when the vacuum valve is faced toward you as seen in Fig \ref{fig:vac-closed} and the vacuum is on when it is faced away from you as seen in Fig \ref{fig:vac-open}.
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.5\linewidth]{Figures/vacclosed.png}
+    \caption{Closed vacuum valve.}
+    \label{fig:vac-closed}
+\end{figure}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.5\linewidth]{Figures/vacopen.png}
+    \caption{Open vacuum valve.}
+    \label{fig:vac-open}
+\end{figure}
+    \item Plug the module pigtails into the data adapter card and power adapter card. 
+    \item Make sure dry air tube is inside the foam and place the foam lid back on
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.5\linewidth]{Figures/moduleinfoambox.png}
+    \caption{Module inside of foam box with pigtails plugged in and dry air tube inside.}
+    \label{fig:module-in-foam}
+\end{figure}
+    \item Make sure the dry air to the enclosure is on, one going directly to the module into the foam box and one going inside of the enclosure. 
+To make sure the dry air is on, check that the dry air gauges shown in Fig \ref{fig:dry-air} have a ball that is floating. If it does not you can adjust the dry air flow using the valve dial that is circled in Fig \ref{fig:dry-air}.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.5\linewidth]{Figures/dryair.png}
+    \caption{Dry air gauge.}
+    \label{fig:dry-air}
+\end{figure}
+
+    \item Make sure all the cabling for breadboards/PCBs and power are plugged in and there are no loose wires, if something is unplugged contact an expert.
+    \item Check on grafana for the correct setup that the NTC of the module is being properly read out. 
+    %% put this in ntc readout debugging section
+
+    This can be done by taking out the pins next to R1 on the power adapter card (PAC) and putting a resistor into these pin holes. You will see on grafana that the module temperature will change to an unreasonable number and this confirms that the temperature is begin read correctly. In Fig \ref{fig:PAC} the braided multicolor wires are plugged into the pins mentioned above. 
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.5\linewidth]{Figures/PAC.png}
+    \caption{Power adapter card.}
+    \label{fig:PAC}
+\end{figure}
+
+    \item Place the level 2 lid back on, reset the hardware interlock and then place the level 1 lid on. At this point you can take off gloves and ESD Bracelet.
+
+    \item Check to make sure valves are open to cool the correct enclosure(s). A valve on the chiller line is closed if it is perpendicular to the chiller line and it is open if it is parallel to the chiller line. An example of this can be seen in Fig \ref{fig:chillervalves}.
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.5\linewidth]{Figures/chillervalves.png}
+    \caption{Chiller Valves with one valve closed and one open.}
+    \label{fig:chillervalves}
+\end{figure}
+
+    
+It is important to make sure that if a chiller line is open, both valves are open to that line, if one valve is open and one valve is closed on the same line, the chiller line will break and leak ethylene glycol (anti freeze) onto the floor when the chiller is ran. 
+
+\end{itemize}
+
+\newpage
+\section{Checking Module Connectivity}
+Turn the chiller on using the script found in Table \ref{tab:commands}. Make sure that the interlock and meerstetter are both good and ready. You can check this in grafana, it should be open on the TV above the stand you are working with but if it is not it can be accessed at \href{https://itkpix-srv.ucsc.edu/grafana/d/adsk2cnkdnda8b/itk-pixel-stand-monitoring?orgId=1&from=now-30m&to=now&timezone=browser&var-stand=ice-king&refresh=5s}{ITk Pixel Stand Monitoring}. 
+
+
+We can pull the chip configuration files from localdb using the following script on daq-05. The correct DAQ cable and stand mapping can be found in Table \ref{tab:daqmap}.
+
+\begin{table}[H]
+    \centering
+    \begin{tabular}{c|c}
+        \hline 
+        Stand & DAQ Cable \\
+        \hline
+        \hline
+        Alpha & A\\
+        Beta & B\\
+        Delta & C\\
+        Epsilon & D\\
+        \hline
+    \end{tabular}
+    \caption{Mapping of DAQ cable to their stand}
+    \label{tab:daqmap}
+\end{table}
+
+\begin{verbatim}
+mqdbt generate-yarr-config --sn [SN] --port [DAQ Cable] 
+--uri mongodb://itkpix-srv.ucsc.edu:27017/localdb?ssl=True 
+--localdb --outdir outputs/
+\end{verbatim}
+Check current with expert
+
+Then we can check the kshunt in chip configuration, this can be done by running this script:
+\begin{verbatim}
+mqat config check-kshunt --config-dir outputs/[SN]
+\end{verbatim}
+
+If the chiller is running at -10$^\circ$C or below and the interlock and meerstetter are ok/ready. We can set the module temperature to 10$^\circ$C and turn on the low voltage power to the module. Once the module is powered on it will heat up and then you can set the module temperature to 25$^\circ$C. 
+\begin{verbatim}
+./Yarr/build/bin/eyeDiagram -r ./Yarr/configs/controller/specCfg-itkpixv2-16x1.json 
+-c outputs/[SN]/[SN]_[layer]_warm.json
+\end{verbatim}
+In the outputs we can see that 4 lanes have good delay settings then the chip can communicate effectively. If it does not have 4 lanes with good delay settings, contact expert. If this still does not work, then the module may be damaged or there may be something wrong with the setup. 
+
+Run a core column scan. This can be done in a daq 05 terminal. 
+\begin{verbatim}
+mqt yarr core-column -c config_epsilon.json -o outputs/[SN]/Measurements/ 
+-m outputs/[SN]/[SN]_[layer]_warm.json 
+\end{verbatim}
+
+
+
+\newpage
+\section{Warm Tests}
+
+The following procedures apply to both Post-Parylene Warm and Final Warm stages.
+
+The first set of tests are performed at 25$^\circ$ C.
+
+The QC criteria and measurement information can be found here \href{run:./ITkPix_electrical_QC-1.pdf}{ITkPIX electrical QC}. (This link does not work but I will fix it when the information is made public.)
+
+For testing on epsilon, all module connectivity files will end in \_epsilon. For example:
+
+\begin{verbatim}
+--module-connectivity outputs/[SN]/[SN]_L[layer]_warm.json
+\end{verbatim}
+will become 
+\begin{verbatim}
+--module-connectivity outputs/[SN]/[SN]_L[layer]_warm_epsilon.json
+\end{verbatim}
+
+\subsection{IV Measure}
+The goal of the IV measurement is to ensure that the sensor leakage current as a function of the bias voltage (IV) is within specs defined in the module specs. 
+
+To start the measurement run this command, note the module power does not need to be turned on for this test.
+
+\begin{verbatim}
+mqt measurement iv-measure --config config_[stand].json -outputs-dir outputs/[SN]
+--module-connectivity outputs/[SN]/[SN]_L[layer]_warm.json
+\end{verbatim}
+
+To check if the measurement fails we can run the analysis script that will return a True or False value. 
+\begin{verbatim}
+mqat analysis iv-measure -i outputs/[SN]/Measurements/IV_MEASURE/[time]
+\end{verbatim}
+
+The time that included in the script is displayed after the measurement has been ran. After seeing that the test passed you can upload to local database by running this script. 
+
+\begin{verbatim}
+mqdbt upload-measurement --host itkpix-srv.ucsc.edu --port 443 --protocol https
+--path outputs/[SN]/Measurements/IV_MEASURE/[time]
+\end{verbatim}
+If the IV measurement failed, contact an expert. If IV looks okay, turn on the LV module power, set the HV to 120 V, and turn on the HV power. See Table \ref{tab:commands} for a list of commands that can be run on daq-05 to make these happen.  
+
+
+\subsection{ADC Calibration}
+
+The analog-to-digital converter (ADC) calibration is done after the IV Measurement so that all the voltages and currents for the front end chips on the module can be read out of the multiplexer. The calibration can be done by running the following script:
+\begin{verbatim}
+mqt measurement adc-calibration --config config_[stand].json 
+-outputs-dir outputs/[SN]
+-module-connectivity outputs/[SN]/[SN]_[layer]_warm.json
+\end{verbatim}
+
+
+Running the analysis script will take in the measurement outputs and determine whether each chip has passed the calibration. The analysis can be done by running the following script. 
+
+\begin{verbatim}
+mqat analysis adc-calibration -i outputs/[SN]/Measurements/ADC_CALIBRATION/[time]
+\end{verbatim}
+If all chips pass you can upload the measurement outputs to the local database by running the following script. 
+\begin{verbatim}
+mqdbt upload-measurement -–host itkpix-srv.ucsc.edu --port 443 -protocol https
+--path outputs/[SN]/Measurements/ADC-CALIBRATION/[time]
+\end{verbatim}
+After uploading you must update the chip configurations because future measurements will use this calibration. This can be done by running the following script. 
+\begin{verbatim}
+mqat config update --input-dir outputs/ADC_CALIBRATION/[time] --config-dir outputs/[SN] 
+-config-type [layer]_warm
+\end{verbatim}
+
+\subsection{Analog Readback}
+
+The goal of the Analog Readback is to read back and ensure all the front end chip internal voltages and currents are calibrated correctly from digital to analog. This test may take over an hour. 
+
+\begin{verbatim}
+mqt measurement analog-readback --config config_[stand].json -outputs-dir outputs/[SN]
+-module-connectivity outputs/[SN]/[SN]_[layer]_warm.json
+\end{verbatim}
+
+To check if the measurement fails we can run the analysis script that will return a True or False value. 
+\begin{verbatim}
+mqat analysis analog-readback -i outputs/[SN]/Measurements/ANALOG_READBACK/[time]
+\end{verbatim}
+
+The time that included in the script is displayed after the measurement has been ran. After seeing that the test passed you can upload to local database by running this script. 
+
+\begin{verbatim}
+mqdbt upload-measurement –host itkpix-srv.ucsc.edu -port 443 -protocol https
+-path outputs/[SN]/Measurements/ANALOG_READBACK/[time]
+\end{verbatim}
+
+\subsection{SLDO Qualification}
+
+
+The Shunt Low Drop Out regulator (SLDO) qualification checks that all front end chip internal values are within nominal operational range after calibration. It can be performed by running the following script:
+
+\begin{verbatim}
+mqt measurement sldo --config config_[stand].json 
+-outputs-dir outputs/[SN]
+-module-connectivity outputs/[SN]/[SN]_[layer]_warm.json
+\end{verbatim}
+
+Running the analysis script will take in the measurement outputs and determine whether each chip has passed the calibration. The analysis can be done by running the following script. An example of a passing SLDO qualification is shown in Fig \ref{fig:PPWSLDO}. 
+
+\begin{verbatim}
+mqat analysis sldo -i outputs/[SN]/Measurements/SLDO/[time]
+\end{verbatim}
+If all chips pass you can upload the measurement outputs to the local database by running the following script. 
+\begin{verbatim}
+mqdbt upload-measurement –host itkpix-srv.ucsc.edu -port 443 -protocol https
+-path outputs/[SN]/Measurements/SLDO/[time]
+\end{verbatim}
+
+
+\subsection{Vcal Calibration}
+
+The goal of the Vcal Calibration calibrate the two digital to analog converters (DAC) that are on the chips. The two DACs have a different voltage ranges (one high and one medium) and each one will have two calibrations with one of the calibrations being a wide range that is appropriate for the DAC and one calibration that is half of the range with a smaller step size.
+
+To start the measurement run this command, note the module power does not need to be turned on for this test.
+
+\begin{verbatim}
+mqt measurement vcal-calibration --config config_[stand].json -outputs-dir outputs/[SN]
+-module-connectivity outputs/[SN]/[SN]_[layer]_warm.json
+\end{verbatim}
+
+To check if the measurement fails we can run the analysis script that will return a True or False value. 
+\begin{verbatim}
+mqat analysis vcal-calibration -i outputs/[SN]/Measurements/VCAL_CALIBRATION/[time]
+\end{verbatim}
+
+The time that included in the script is displayed after the measurement has been ran. After seeing that the test passed you can upload to local database by running this script. 
+
+\begin{verbatim}
+mqdbt upload-measurement –host itkpix-srv.ucsc.edu -port 443 -protocol https
+-path outputs/[SN]/Measurements/VCAL_CALIBRATION/[time]
+\end{verbatim}
+
+After uploading you must update the chip configurations because future measurements will use this calibration. This can be done by running the following script. 
+\begin{verbatim}
+mqat config update --input-dir outputs/VCAL_CALIBRATOIN/[time] --config-dir outputs/[SN] 
+-config-type [layer]_warm
+\end{verbatim}
+
+\subsection{Injection Capacitance}
+
+The goal of the injection capacitance is to cross-check and update the injection capacitance measured at wafer probing. This capacitance is used to calculate the injected charge used for chip tuning. 
+
+\begin{verbatim}
+mqt measurement injection-capacitance --config config_[stand].json -outputs-dir 
+outputs/[SN] -module-connectivity outputs/[SN]/[SN]_[layer]_warm.json
+\end{verbatim}
+
+To check if the measurement fails we can run the analysis script that will return a True or False value. 
+\begin{verbatim}
+mqat analysis vcal-calibration -i outputs/[SN]/Measurements/INJECTION_CAPACITANCE/[time]
+\end{verbatim}
+
+The time that included in the script is displayed after the measurement has been ran. After seeing that the test passed you can upload to local database by running this script. 
+
+\begin{verbatim}
+mqdbt upload-measurement –host itkpix-srv.ucsc.edu -port 443 -protocol https
+-path outputs/[SN]/Measurements/INJECTION_CAPACITANCE/[time]
+\end{verbatim}
+After uploading you must update the chip configurations because future measurements will use this calibration. This can be done by running the following script. 
+\begin{verbatim}
+mqat config update --input-dir outputs/INJECTION_CAPACITANCE/[time] --config-dir 
+outputs/[SN] --config-type [layer]_warm
+\end{verbatim}
+
+\subsection{Data Transmission}
+
+The goal of the data transmission is to data-link quality is sufficient.
+
+\begin{verbatim}
+mqt measurement data-transmission --config config_[stand].json -outputs-dir outputs/[SN]
+-module-connectivity outputs/[SN]/[SN]_[layer]_warm.json
+\end{verbatim}
+
+To check if the measurement fails we can run the analysis script that will return a True or False value. 
+\begin{verbatim}
+mqat analysis vcal-calibration -i outputs/[SN]/Measurements/DATA_TRANSMISSION/[time]
+\end{verbatim}
+
+The time that included in the script is displayed after the measurement has been ran. After seeing that the test passed you can upload to local database by running this script. 
+
+\begin{verbatim}
+mqdbt upload-measurement –host itkpix-srv.ucsc.edu -port 443 -protocol https
+-path outputs/[SN]/Measurements/DATA_TRANSMISSION/[time]
+\end{verbatim}
+After uploading you must update the chip configurations because future measurements will use this calibration. This can be done by running the following script. 
+\begin{verbatim}
+mqat config update --input-dir outputs/DATA_TRANSMISSION/[time] --config-dir outputs/[SN] 
+-config-type [layer]_warm
+\end{verbatim}
+
+\subsection{Low Power Mode}
+
+The goal of low power mode is to verify functionality of the LP mode for the nominal LP current.
+
+\begin{verbatim}
+mqt measurement data-transmission --config config_[stand].json -outputs-dir outputs/[SN]
+-module-connectivity outputs/[SN]/[SN]_[layer]_LP.json
+\end{verbatim}
+
+To check if the measurement fails we can run the analysis script that will return a True or False value. 
+\begin{verbatim}
+mqat analysis vcal-calibration -i outputs/[SN]/Measurements/DATA_TRANSMISSION/[time]
+\end{verbatim}
+
+The time that included in the script is displayed after the measurement has been ran. After seeing that the test passed you can upload to local database by running this script. 
+
+\begin{verbatim}
+mqdbt upload-measurement –host itkpix-srv.ucsc.edu -port 443 -protocol https
+-path outputs/[SN]/Measurements/DATA_TRANSMISSION/[time]
+\end{verbatim}
+
+\subsection{Pixel Perfomance}
+%%%% add screenshots of localdb checkout scans
+
+
+\subsubsection{Minimal Health Test}
+
+The minimal health test is a fast crosscheck of the functionality of a chip. It will not be possible to determine any pixel specific count from this test, but it will identify gross defects. It can be performed by running the following script. 
+
+\begin{verbatim}
+mqt yarr mht -c ~/config_epsilon.json -o outputs/[SN]/
+-m outputs/[SN]/[SN]_[layer]_warm.json 
+\end{verbatim}
+
+To check if the test passed, go to localdb, go to the page of one of the front end chips on the module that is being tested. Once there and you are signed into pixdaq on localdb scroll down to minimal health test and click "Checkout Scans", then you will select the most recent YARR Scan based on the date it was ran or the highest YARR Scan Run Number. Click the checkbox that says "Use the same set of YARR scans for the rest FE Chips of the module" so that you don't have to repeat the previous steps for the other FE chips. After clicking proceed, the test will be analyzed and the results will be available at the main page of the FE chip. 
+
+\subsubsection{Clear Chip Configs}
+
+Before the tuning preformance the chip configuration files must be cleared. This can be done by running the following script. 
+
+\begin{verbatim}
+Yarr/scripts/clear_chip_config.py --input-dir outputs/DATA_TRANSMISSION/[time] 
+-config-dir outputs/[SN] --config-type [layer]_warm
+\end{verbatim}
+
+\subsubsection{Tuning Performance}
+
+The tuning performance test is to check that a tuning was overall successful and the chip behaves as expected.
+
+\begin{verbatim}
+mqt yarr tun -c ~/config_epsilon.json -o outputs/[SN]/
+-m outputs/[SN]/[SN]_[layer]_warm.json 
+\end{verbatim}
+
+To check if the test passed, go to localdb, go to the page of one of the front end chips on the module that is being tested. Once there and you are signed into pixdaq on localdb scroll down to tuning performance and click "Checkout Scans", then you will select the most recent YARR Scan based on the date it was ran or the highest YARR Scan Run Number. Click the checkbox that says "Use the same set of YARR scans for the rest FE Chips of the module" so that you don't have to repeat the previous steps for the other FE chips. After clicking proceed, the test will be analyzed and the results will be available at the main page of the FE chip. 
+
+\subsubsection{Pixel Failure Test}
+
+Pixel Failure Test is the last test that is ran after tuning the chip because the chip can report untuned pixels as failing. This test will run a series of scans to determine if pixels are digital dead, digital bad, analog dead, analog bad, and noisy pixels.
+
+\begin{verbatim}
+mqt yarr pfa -c config_epsilon.json -o outputs/[SN]/
+-m outputs/[SN]/[SN]_[layer]_warm.json  
+\end{verbatim}
+
+To check if the test passed, go to localdb, go to the page of one of the front end chips on the module that is being tested. Once there and you are signed into pixdaq on localdb scroll down to pixel failure analysis and click "Checkout Scans", then you will select the most recent YARR Scan based on the date it was ran or the highest YARR Scan Run Number. Click the checkbox that says "Use the same set of YARR scans for the rest FE Chips of the module" so that you don't have to repeat the previous steps for the other FE chips. After clicking proceed, the test will be analyzed and the results will be available at the main page of the FE chip. 
+
+If the test passed locally sign off on the current stage you are in in localdb this can be done by clicking the stage sign off shown in Fig \ref{fig:sign-off}. Select all QC tests that passed and click proceed. Now you are finished with your current stage. Any pdb changes should be handled by an expert. 
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1\linewidth]{Figures/localdbsignoff.png}
+    \caption{Stage sign off in local db.}
+    \label{fig:sign-off}
+\end{figure}
+
+\newpage
+\section{Cold Tests}
+
+The following procedures apply to both Post-Parylene Warm and Final Warm stages.
+
+The first set of tests are performed at -15$^\circ$C.
+
+\subsection{IV Measure}
+The goal of the IV measurement is to ensure that the sensor leakage current as a function of the bias voltage (IV) is within specs defined in the module specs. 
+
+To start the measurement run this command, note the module power does not need to be turned on for this test.
+
+\begin{verbatim}
+mqt measurement iv-measure --config config_[stand].json -outputs-dir outputs/[SN]
+-module-connectivity outputs/[SN]/[SN]_[layer]_cold.json
+\end{verbatim}
+
+To check if the measurement fails we can run the analysis script that will return a True or False value. 
+\begin{verbatim}
+mqat analysis iv-measure -i outputs/[SN]/Measurements/IV_MEASURE/[time]
+\end{verbatim}
+
+The time that included in the script is displayed after the measurement has been ran. Upload the test to localdb.
+
+\begin{verbatim}
+mqdbt upload-measurement –host itkpix-srv.ucsc.edu -port 443 -protocol https
+-path outputs/[SN]/Measurements/IV_MEASURE/[time]
+\end{verbatim}
+
+If the IV measurement failed, contact an expert. If IV looks okay, turn on the LV module power, set the HV to 120 V, and turn on the HV power. See Table \ref{tab:commands} for a list of commands that can be run on daq-05 to make these happen.  
+
+\subsection{ADC Calibration}
+
+The analog-to-digital converter (ADC) calibration is done after the IV Measurement so that all the voltages and currents for the front end chips on the module can be read out of the multiplexer. The calibration can be done by running the following script:
+\begin{verbatim}
+mqt measurement adc-calibration --config config_[stand].json 
+-outputs-dir outputs/[SN]
+-module-connectivity outputs/[SN]/[SN]_[layer]_cold.json
+\end{verbatim}
+
+
+Running the analysis script will take in the measurement outputs and determine whether each chip has passed the calibration. The analysis can be done by running the following script. 
+
+\begin{verbatim}
+mqat analysis adc-calibration -i outputs/[SN]/Measurements/ADC_CALIBRATION/[time]
+\end{verbatim}
+If all chips pass you can upload the measurement outputs to the local database by running the following script. 
+\begin{verbatim}
+mqdbt upload-measurement –host itkpix-srv.ucsc.edu -port 443 -protocol https
+-path outputs/[SN]/Measurements/ADC-CALIBRATION/[time]
+\end{verbatim}
+After uploading you must update the chip configurations because future measurements will use this calibration. This can be done by running the following script. 
+\begin{verbatim}
+mqat config update --input-dir outputs/ADC_CALIBRATION/[time] --config-dir outputs/[SN] 
+-config-type [layer]_cold
+\end{verbatim}
+
+\subsection{Analog Readback}
+
+The goal of the Analog Readback is to read back and ensure all the front end chip internal voltages and currents are calibrated correctly from digital to analog.  
+
+\begin{verbatim}
+mqt measurement analog-readback --config config_[stand].json -outputs-dir outputs/[SN]
+-module-connectivity outputs/[SN]/[SN]_[layer]_cold.json
+\end{verbatim}
+
+To check if the measurement fails we can run the analysis script that will return a True or False value. 
+\begin{verbatim}
+mqat analysis iv-measure -i outputs/[SN]/Measurements/ANALOG_READBACK/[time]
+\end{verbatim}
+
+The time that included in the script is displayed after the measurement has been ran. After seeing that the test passed you can upload to local database by running this script. 
+
+\begin{verbatim}
+mqdbt upload-measurement –host itkpix-srv.ucsc.edu -port 443 -protocol https
+-path outputs/[SN]/Measurements/ANALOG_READBACK/[time]
+\end{verbatim}
+
+\subsection{SLDO Qualification}
+
+
+The Shunt Low Drop Out regulator (SLDO) qualification checks that all front end chip internal values are within nominal operational range after calibration. It can be performed by running the following script:
+
+\begin{verbatim}
+mqt measurement sldo --config config_[stand].json 
+-outputs-dir outputs/[SN]
+-module-connectivity outputs/[SN]/[SN]_[layer]_cold.json
+\end{verbatim}
+
+Running the analysis script will take in the measurement outputs and determine whether each chip has passed the calibration. The analysis can be done by running the following script. An example of a passing SLDO qualification is shown in Fig \ref{fig:PPWSLDO}. 
+
+\begin{verbatim}
+mqat analysis sldo -i outputs/[SN]/Measurements/SLDO/[time]
+\end{verbatim}
+If all chips pass you can upload the measurement outputs to the local database by running the following script. 
+\begin{verbatim}
+mqdbt upload-measurement –host itkpix-srv.ucsc.edu -port 443 -protocol https
+-path outputs/[SN]/Measurements/SLDO/[time]
+\end{verbatim}
+After uploading you must update the chip configurations because future measurements will use this calibration. This can be done by running the following script. 
+\begin{verbatim}
+mqat config update --input-dir outputs/SLDO/[time] --config-dir outputs/[SN] 
+-config-type [layer]_cold
+\end{verbatim}
+
+\subsection{Vcal Calibration}
+
+The goal of the Vcal Calibration calibrate the two digital to analog converters (DAC) that are on the chips. The two DACs have a different voltage ranges (one high and one medium) and each one will have two calibrations with one of the calibrations being a wide range that is appropriate for the DAC and one calibration that is half of the range with a smaller step size.
+
+To start the measurement run this command, note the module power does not need to be turned on for this test.
+
+\begin{verbatim}
+mqt measurement vcal-calibration --config config_[stand].json -outputs-dir outputs/[SN]
+-module-connectivity outputs/[SN]/[SN]_[layer]_cold.json
+\end{verbatim}
+
+To check if the measurement fails we can run the analysis script that will return a True or False value. 
+\begin{verbatim}
+mqat analysis vcal-calibration -i outputs/[SN]/Measurements/VCAL_CALIBRATION/[time]
+\end{verbatim}
+
+The time that included in the script is displayed after the measurement has been ran. After seeing that the test passed you can upload to local database by running this script. 
+
+\begin{verbatim}
+mqdbt upload-measurement –host itkpix-srv.ucsc.edu -port 443 -protocol https
+-path outputs/[SN]/Measurements/VCAL_CALIBRATION/[time]
+\end{verbatim}
+
+After uploading you must update the chip configurations because future measurements will use this calibration. This can be done by running the following script. 
+\begin{verbatim}
+mqat config update --input-dir outputs/VCAL_CALIBRATOIN/[time] --config-dir outputs/[SN] 
+-config-type [layer]_cold
+\end{verbatim}
+
+\subsection{Injection Capacitance}
+
+The goal of the injection capacitance is to cross-check and update the injection capacitance measured at wafer probing. This capacitance is used to calculate the injected charge used for chip tuning. 
+
+\begin{verbatim}
+mqt measurement injection-capacitance --config config_[stand].json 
+-outputs-dir outputs/[SN] -module-connectivity outputs/[SN]/[SN]_[layer]_cold.json
+\end{verbatim}
+
+To check if the measurement fails we can run the analysis script that will return a True or False value. 
+\begin{verbatim}
+mqat analysis vcal-calibration 
+-i outputs/[SN]/Measurements/INJECTION_CAPACITANCE/[time]
+\end{verbatim}
+
+The time that included in the script is displayed after the measurement has been ran. After seeing that the test passed you can upload to local database by running this script. 
+
+\begin{verbatim}
+mqdbt upload-measurement –host itkpix-srv.ucsc.edu -port 443 -protocol https
+-path outputs/[SN]/Measurements/INJECTION_CAPACITANCE/[time]
+\end{verbatim}
+After uploading you must update the chip configurations because future measurements will use this calibration. This can be done by running the following script. 
+\begin{verbatim}
+mqat config update --input-dir outputs/INJECTION_CAPACITANCE/[time] 
+-config-dir outputs/[SN] --config-type [layer]_cold
+\end{verbatim}
+
+\subsection{Data Transmission}
+
+The goal of the data transmission is to data-link quality is sufficient for operation in the detector system with full
+166 services and connected to Low Power GigaBit Transceiver (lpGBT) and to ensure that chip to chip communication within a module is fully working 177
+with margin.
+
+\begin{verbatim}
+mqt measurement data-transmission --config config_[stand].json 
+-outputs-dir outputs/[SN] -module-connectivity outputs/[SN]/[SN]_[layer]_cold.json
+\end{verbatim}
+
+To check if the measurement fails we can run the analysis script that will return a True or False value. 
+\begin{verbatim}
+mqat analysis vcal-calibration -i outputs/[SN]/Measurements/DATA_TRANSMISSION/[time]
+\end{verbatim}
+
+The time that included in the script is displayed after the measurement has been ran. After seeing that the test passed you can upload to local database by running this script. 
+
+\begin{verbatim}
+mqdbt upload-measurement –host itkpix-srv.ucsc.edu -port 443 -protocol https
+-path outputs/[SN]/Measurements/DATA_TRANSMISSION/[time]
+\end{verbatim}
+After uploading you must update the chip configurations because future measurements will use this calibration. This can be done by running the following script. 
+\begin{verbatim}
+mqat config update --input-dir outputs/DATA_TRANSMISSION/[time] 
+-config-dir outputs/[SN] --config-type [layer]_cold
+\end{verbatim}
+
+\subsection{Pixel Perfomance}
+
+
+
+\subsubsection{Minimal Health Test}
+
+The minimal health test is a fast crosscheck of the functionality of a chip. It will not be possible to determine any pixel specific count from this test, but it will identify gross defects. It can be performed by running the following script. 
+
+\begin{verbatim}
+mqt yarr mht -c config_epsilon.json -o outputs/[SN]/
+-m outputs/[SN]/[SN]_[layer]_cold.json 
+\end{verbatim}
+
+To check if the test passed, go to localdb, go to the page of one of the front end chips on the module that is being tested. Once there and you are signed into pixdaq on localdb scroll down to minimal health test and click "Checkout Scans", then you will select the most recent YARR Scan based on the date it was ran or the highest YARR Scan Run Number. Click the checkbox that says "Use the same set of YARR scans for the rest FE Chips of the module" so that you don't have to repeat the previous steps for the other FE chips. After clicking proceed, the test will be analyzed and the results will be available at the main page of the FE chip. 
+
+\subsubsection{Clear Chip Configs}
+
+Before the tuning preformance the chip configuration files must be cleared. This can be done by running the following script. 
+
+\begin{verbatim}
+Yarr/scripts/clear_chip_config.py --input-dir outputs/DATA_TRANSMISSION/[time] 
+-config-dir outputs/[SN] --config-type [layer]_cold
+\end{verbatim}
+
+\subsubsection{Tuning Performance}
+
+The tuning performance test is to check that a tuning was overall successful and the chip behaves as expected.
+
+\begin{verbatim}
+mqt yarr tun -c config_epsilon.json -o outputs/[SN]/
+-m outputs/[SN]/[SN]_[layer]_cold.json 
+\end{verbatim}
+
+To check if the test passed, go to localdb, go to the page of one of the front end chips on the module that is being tested. Once there and you are signed into pixdaq on localdb scroll down to tuning performance and click "Checkout Scans", then you will select the most recent YARR Scan based on the date it was ran or the highest YARR Scan Run Number. Click the checkbox that says "Use the same set of YARR scans for the rest FE Chips of the module" so that you don't have to repeat the previous steps for the other FE chips. After clicking proceed, the test will be analyzed and the results will be available at the main page of the FE chip. 
+
+\subsubsection{Pixel Failure Test}
+
+Pixel Failure Test is the last test that is ran after tuning the chip because the chip can report untuned pixels as failing. This test will run a series of scans to determine if pixels are digital dead, digital bad, analog dead, analog bad, and noisy pixels.
+
+\begin{verbatim}
+mqt yarr pfa -c config_epsilon.json -o outputs/[SN]/
+-m outputs/[SN]/[SN]_[layer]_cold.json  --use-pixel-config -tag PFA 
+\end{verbatim}
+
+\textbf{This next test will only be done in the Final Cold stage and only be done by those who have radiation safety training.}\\
+
+If you need radiation safety training please contact Jason Nielsen. \\
+
+While wearing wearing gloves grab a radiation source from the vault that has radiation warnings on it that is underneath the visual inspection table. Open the larger acrylic lid on the setup and place the source on top of the secondary acrylic lid in the square cut out above the foam box. Place the larger acrylic lid back onto the setup and then set the high voltage to 120 V by running the set hv script on multivisor for the specific setup you are working on. Start the source scan by running the following script. 
+
+\begin{verbatim}
+mqt yarr scan -scan ‘selftrigger_source.json’ -tag PFA -c config_epsilon.json 
+-o outputs/[SN]/-m outputs/[SN]/[SN]_[layer]_cold.json  
+\end{verbatim}
+
+To check if the test passed, go to localdb, go to the page of one of the front end chips on the module that is being tested. Once there and you are signed into pixdaq on localdb scroll down to pixel failure analysis and click "Checkout Scans", then you will select the most recent YARR Scan based on the date it was ran or the highest YARR Scan Run Number. Click the checkbox that says "Use the same set of YARR scans for the rest FE Chips of the module" so that you don't have to repeat the previous steps for the other FE chips. After clicking proceed, the test will be analyzed and the results will be available at the main page of the FE chip. If the test passed, while wearing gloves, open the larger acrylic lid and put the source back into the radiation source vault. 
+
+If the test passed locally sign off on the current stage you are in in localdb this can be done by clicking the stage sign off shown in Fig \ref{fig:sign-off}. Select all QC tests that passed and click proceed. Now you are finished with your current stage. Any pdb changes should be handled by an expert. 
+
+\section{Thermal Cycling}
+
+While the chiller is currently on and below -10$^\circ$C and module is powered off and at 25$^\circ$C run the following script to start the thermal cycle. 
+
+
+\section{Resetting the meerstetter}
+\label{sec:meerstetter}
+
+If the meerstetter has an error code which can be seen in grafana. Then you must reset it. 
+
+The following are common error codes that you may encounter. 
+\begin{table}[H]
+    \centering
+    \begin{tabular}{l|l|l}
+        \hline 
+        Error Code & Description & Why it has happened\\
+        \hline
+        \hline
+        108 & Output Stage saturation error.  & Interlock turned off meerstetter power\\
+        138 & Measured object temperature out of& Module got too hot when turned on.\\
+        &permitted range&\\
+        139 & Change in measured object & Module got too hot too fast when\\
+        &temperature too fast (outpacing& turned on.\\
+        &thermal inertia)&\\
+        \hline
+    \end{tabular}
+    \caption{Common meerstetter error codes.}
+    \label{tab:meer}
+\end{table}
+
+To reset the interlock follow these steps, the commands for each step can be found in Table \ref{tab:commands}. 
+\begin{itemize}
+    \item Disarm the interlock if it hasn't already been tripped.
+    \item Reset the meerstetter.
+    \item Disable the meerstetter.
+    \item Rearm interlock.
+\end{itemize}
+
+\section{Rearming the interlock}
+\label{sec:interlock}
+
+If the interlock has been tripped you can see what the problem is in grafana, the interlock section should display the interlock trip condition. Make sure the condition that has tripped the interlock is no longer occurring before you try to rearm it. 
+
+The following are causes for the interlock to trip.
+\begin{table}[H]
+    \centering
+    \begin{tabular}{l}
+        \hline 
+        Condition\\
+        \hline
+        \hline
+        Lid open\\
+        Module temp $>$ 45$^\circ$C\\
+        Module temp $<$ -55$^\circ$C\\
+        T$_\text{dew} \geq$ T$_\text{chuck}$\\
+        \hline
+    \end{tabular}
+    \caption{Common meerstetter error codes.}
+    \label{tab:meer}
+\end{table}
+
+\section{Commands}
+The following commands can be run in a daq-05 terminal. 
+\begin{table}[H]
+    \centering
+    \begin{tabular}{l|l}
+        \hline 
+        Action & Command \\
+        \hline
+        \hline
+        Turning on module low voltage & [stand]-lv-on\\
+        Turning off module low voltage & [stand]-lv-off\\
+        Setting module high voltage to 120 V & [stand]-set-hv-120\\
+        Turning on module high voltage & [stand]-hv-on\\
+        Turning off module high voltage & [stand]-hv-off\\
+        Rearming the interlock & [stand]-interlock-rearm\\
+        Turning on chiller & chiller-on-[chiller]\\
+        Turning off chiller & chiller-off-[chiller]\\
+        Resetting meerstetter & [stand]-meerstetter reset\\
+        Disabling meerstetter & [stand]-meerstetter disable\\
+        Setting peltier temperature & [stand]-meerstetter to\_temp [temp]\\
+        \hline
+    \end{tabular}
+    \caption{Table of commands and their action.}
+    \label{tab:commands}
+\end{table}
+
+\end{document}

@@ -1,0 +1,42 @@
+name: Compile LaTeX Testing Documentation
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v4
+
+    - name: Install TeX Live
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y texlive-full
+
+    - name: Compile PDF with latexmk
+      run: |
+        latexmk -pdf -interaction=nonstopmode -output-directory=out main.tex
+
+    - name: Upload PDF
+      uses: actions/upload-artifact@v4
+      with:
+        name: compiled-pdf
+        path: out/main.pdf
+        
+    - name: Commit PDF to repo
+      run: |
+        git config --global user.name 'github-actions[bot]'
+        git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+        cp out/main.pdf compiled-cv.pdf
+        git add compiled-cv.pdf
+        git commit -m "Add compiled CV PDF [auto]" || echo "No changes to commit"
+        git push https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git
