@@ -8,6 +8,9 @@ on:
 jobs:
   process-docs:
     runs-on: ubuntu-latest
+    environment: 
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
     permissions:
       contents: write
       pages: write
@@ -32,11 +35,16 @@ jobs:
         git add main.md
         git commit -m "Auto-convert LaTeX to Markdown" || echo "No changes to commit"
 
+    - name: Set up Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+
     - name: Convert Markdown to HTML
       run: |
         npm install marked
         npx marked main.md > content.html
-
+        
         echo '<!DOCTYPE html>
         <html>
         <head>
@@ -71,6 +79,7 @@ jobs:
         path: .
 
     - name: Deploy to GitHub Pages
+      id: deployment
       uses: actions/deploy-pages@v4
       
     - name: Push all changes
