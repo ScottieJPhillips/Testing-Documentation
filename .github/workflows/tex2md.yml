@@ -1,0 +1,30 @@
+name: Convert LaTeX to Markdown
+
+on:
+  push:
+    paths:
+      - 'main.tex'
+
+jobs:
+  convert-latex-to-md:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Convert LaTeX to Markdown
+      run: |
+        # Convert only main.tex to main.md
+        sed -e 's/\\begin{verbatim}/```/g' \
+            -e 's/\\end{verbatim}/```/g' \
+            "main.tex" > "main.md"
+        
+        echo "Converted main.tex to main.md"
+
+    - name: Commit and push changes
+      run: |
+        git config --global user.name "GitHub Actions"
+        git config --global user.email "actions@github.com"
+        git add main.md
+        git diff --quiet && git diff --staged --quiet || git commit -m "Auto-convert LaTeX to Markdown"
+        git push

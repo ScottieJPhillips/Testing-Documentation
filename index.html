@@ -1,43 +1,16 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Documentation Viewer</title>
-    <style>
-        body, html {
-            margin: 0;
-            padding: 0;
-            height: 100%;
-            overflow: hidden;
-        }
-        .pdf-container {
-            width: 100%;
-            height: 100vh;
-            position: absolute;
-            top: 0;
-            left: 0;
-        }
-        iframe {
-            width: 100%;
-            height: 100%;
-            border: none;
-        }
-        .fallback {
-            padding: 20px;
-            text-align: center;
-        }
-    </style>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@ionic/core/css/ionic.bundle.css">
 </head>
 <body>
-    <div class="pdf-container">
-        <iframe 
-            src="out/main.pdf#toolbar=1&navpanes=0&scrollbar=0" 
-            title="PDF Documentation"
-            allowfullscreen>
-            <div class="fallback">
-                <p>Your browser doesn't support embedded PDFs.</p>
-                <a href="out/main.pdf" download>Download PDF instead</a>
-            </div>
-        </iframe>
-    </div>
+  <ion-app>
+    <ion-content>
+      <ion-markdown src="./main.md"></ion-markdown>
+    </ion-content>
+  </ion-app>
+
+  <script type="module" src="https://cdn.jsdelivr.net/npm/@ionic/core/dist/ionic/ionic.esm.js"></script>
+  <script nomodule src="https://cdn.jsdelivr.net/npm/@ionic/core/dist/ionic/ionic.js"></script>
 </body>
 </html>
