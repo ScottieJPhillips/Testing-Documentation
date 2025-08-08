@@ -1,6 +1,6 @@
 \documentclass[12pt]{article}
 \usepackage[english]{babel}
-\usepackage[utf-8]{inputenc}  %%latin1
+\usepackage[utf-8]{inputenc}
 \usepackage{fullpage}
 \usepackage{verbatim}
 \usepackage{pgffor}
@@ -16,7 +16,7 @@
     pdftitle={Overleaf Example},
     pdfpagemode=FullScreen,
     }
-\usepackage{graphicx}		%% to insert pics
+\usepackage{graphicx}
 \usepackage{listings}
 \usepackage{color}
 
@@ -35,7 +35,7 @@
   commentstyle=\color{mygreen},    % comment style
   escapeinside={\%*}{*)},          % if you want to add LaTeX within your code
   keywordstyle=\color{blue},       % keyword style
-  stringstyle=\color{mymauve},     % string literal style
+  stringstyle=\color{mymauve},
 }
 
 \begin{document}
@@ -46,7 +46,6 @@ This guide outlines the reception, inspection, handling, and testing procedures 
 \tableofcontents
 \newpage 
 %%%%% Change multivisor processes to TUI or command line process.
-%%% add level 1 and 2 to lid references 
 %%% add commands section so that you can say to just turn on lv or chiller anf they 
 %% test passing does npt matter, always upload
 \section{Module Reception}
