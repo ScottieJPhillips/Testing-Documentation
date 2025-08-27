@@ -38,6 +38,8 @@ There can be multiple modules in a single delivery and the next steps will be re
 
 -   Check in local db that the current stage of the module is MODULE/POST_PARYLENE_WARM, if it is not then contact an expert.
 
+-   While on that same module page in localdb. If there is a warning that is telling you to sync the FE Chip configs for the current stage you can do that by clicking the hyperlink displayed in the warning message labeled \"sync the FE chip configs\".
+
 # Visual Inspection {#sec:vis-inspect}
 
 The purpose of the visual inspection is to ensure that the chip is not damaged. Visual inspection will require the following PPE to be worn on top of the standard cleanroom PPE.
@@ -63,6 +65,8 @@ In Fig [5](#fig:visinspect){reference-type="ref" reference="fig:visinspect"} the
 -   on daq05 terminal run the following script in the monitoring/visual_inspection folder. This will open a graphic user interface that you will use to capure images of the module.
 
         venv/bin/python get_image.py
+
+-   Start the camera preview
 
 -   Change the focus on the camera and in the visual inspection user interface change the zoom to make sure that the wirebonds are in focus when zoomed in.
 
@@ -104,7 +108,13 @@ Take the module outside of the visual inspection area of the dry air cabinet. If
 
 -   Take off the level one and level two lids and remove the lid to the foam box.
 
--   Use a small amount of isopropyl alcohol (IPA) on a cotton tipped applicators that you can find by the sink to wipe down the vacuum chuck.
+-   Use a small amount of isopropyl alcohol (IPA) on a cotton tipped applicator that you can find by the sink in the back of the clean room to wipe down the vacuum chuck. You can unplug the ESD strap to go to the sink, just plug it back in before handling any modules.
+
+-   Make sure that the rubber gasket is flush with the chuck.
+
+-   Make sure that you are wearing ESD strap now.
+
+-   Place the module into the white plastic carrier. Unscrew the base plate screws, alternating between the screws, doing half a screw at a time.
 
 -   Take the base plate off of the module and place it on the vacuum chuck, make sure there is full contact between the chuck and module and make sure that it is oriented correctly so that the pigtails can be plugged in, see Fig [11](#fig:module-in-foam){reference-type="ref" reference="fig:module-in-foam"}.
 
@@ -114,9 +124,9 @@ Take the module outside of the visual inspection area of the dry air cabinet. If
 
     ![Open vacuum valve.](Figures/vacopen.png){#fig:vac-open width="0.5\\linewidth"}
 
--   Plug the module pigtails into the data adapter card and power adapter card.
+-   Plug the module pigtails into the data adapter card and power adapter card. The data adapter card has a lever that keeps the pigtail locked in its connection so to connect the pigtail the black lever must be up before inserting the connector and then flipped down to lock it in place.
 
--   Make sure dry air tube is inside the foam and place the foam lid back on
+-   Make sure dry air tube is inside the foam, so that is blowing air directly on top of the module and place the foam lid back on
 
     ![Module inside of foam box with pigtails plugged in and dry air tube inside.](Figures/moduleinfoambox.png){#fig:module-in-foam width="0.5\\linewidth"}
 
@@ -167,7 +177,7 @@ Then we can check the kshunt in chip configuration, this can be done by running 
 
     mqat config check-kshunt --config-dir outputs/[SN]
 
-If the chiller is running at -10$^\circ$C or below and the interlock and meerstetter are ok/ready. We can set the module temperature to 10$^\circ$C and turn on the low voltage power to the module. Once the module is powered on it will heat up and then you can set the module temperature to 25$^\circ$C.
+If the chiller is running at -10$^\circ$C or below and the interlock and meerstetter are ok/ready. We can set the module temperature to 10$^\circ$C and turn on the low voltage power to the module. Once the module is powered on it will heat up and then you can set the module temperature to 20$^\circ$C.
 
     ./Yarr/build/bin/eyeDiagram -r ./Yarr/configs/controller/specCfg-itkpixv2-16x1.json 
     -c outputs/[SN]/[SN]_[layer]_warm.json
@@ -179,21 +189,27 @@ Run a core column scan. This can be done in a daq 05 terminal.
     mqt yarr core-column -c config_epsilon.json -o outputs/[SN]/Measurements/ 
     -m outputs/[SN]/[SN]_[layer]_warm.json 
 
+# Pretest Checks
+
+The following things should be checked before doing any tests.
+
+-   inerlock status
+
+-   Meerstetter status
+
+-   Humidity
+
+-   Pressure
+
+-   Chiller temp
+
 # Warm Tests
 
 The following procedures apply to both Post-Parylene Warm and Final Warm stages.
 
-The first set of tests are performed at 25$^\circ$ C.
+The first set of tests are performed at 20$^\circ$ C.
 
 The QC criteria and measurement information can be found here [ITkPIX electrical QC](run:./ITkPix_electrical_QC-1.pdf). (This link does not work but I will fix it when the information is made public.)
-
-For testing on epsilon, all module connectivity files will end in \_epsilon. For example:
-
-    --module-connectivity outputs/[SN]/[SN]_L[layer]_warm.json
-
-will become
-
-    --module-connectivity outputs/[SN]/[SN]_L[layer]_warm_epsilon.json
 
 ## IV Measure
 
@@ -213,7 +229,7 @@ The time that included in the script is displayed after the measurement has been
     mqdbt upload-measurement --host itkpix-srv.ucsc.edu --port 443 --protocol https
     --path outputs/[SN]/Measurements/IV_MEASURE/[time]
 
-If the IV measurement failed, contact an expert. If IV looks okay, turn on the LV module power, set the HV to 120 V, and turn on the HV power. See Table [4](#tab:commands){reference-type="ref" reference="tab:commands"} for a list of commands that can be run on daq-05 to make these happen.
+If the IV measurement failed, contact an expert. If IV looks okay, turn on the LV module power, set the HV to 120 V, and turn on the HV power. See Table [4](#tab:commands){reference-type="ref" reference="tab:commands"} for a list of commands that can be run on daq-05.
 
 ## ADC Calibration
 
@@ -302,7 +318,7 @@ The goal of the injection capacitance is to cross-check and update the injection
 
 To check if the measurement fails we can run the analysis script that will return a True or False value.
 
-    mqat analysis vcal-calibration -i outputs/[SN]/Measurements/INJECTION_CAPACITANCE/[time]
+    mqat analysis injection-capacitance -i outputs/[SN]/Measurements/INJECTION_CAPACITANCE/[time]
 
 The time that included in the script is displayed after the measurement has been ran. After seeing that the test passed you can upload to local database by running this script.
 
@@ -323,7 +339,7 @@ The goal of the data transmission is to data-link quality is sufficient.
 
 To check if the measurement fails we can run the analysis script that will return a True or False value.
 
-    mqat analysis vcal-calibration -i outputs/[SN]/Measurements/DATA_TRANSMISSION/[time]
+    mqat analysis data-tranmsission -i outputs/[SN]/Measurements/DATA_TRANSMISSION/[time]
 
 The time that included in the script is displayed after the measurement has been ran. After seeing that the test passed you can upload to local database by running this script.
 
@@ -344,7 +360,7 @@ The goal of low power mode is to verify functionality of the LP mode for the nom
 
 To check if the measurement fails we can run the analysis script that will return a True or False value.
 
-    mqat analysis vcal-calibration -i outputs/[SN]/Measurements/DATA_TRANSMISSION/[time]
+    mqat analysis lp-mode -i outputs/[SN]/Measurements/LP_MODE/[time]
 
 The time that included in the script is displayed after the measurement has been ran. After seeing that the test passed you can upload to local database by running this script.
 
@@ -366,8 +382,7 @@ To check if the test passed, go to localdb, go to the page of one of the front e
 
 Before the tuning preformance the chip configuration files must be cleared. This can be done by running the following script.
 
-    Yarr/scripts/clear_chip_config.py --input-dir outputs/DATA_TRANSMISSION/[time] 
-    -config-dir outputs/[SN] --config-type [layer]_warm
+    python Yarr/scripts/clear_chip_config.py -c outputs/20UPIM13710377/20UPIM13710377_[layer]_[stand].json
 
 ### Tuning Performance
 
@@ -393,7 +408,7 @@ If the test passed locally sign off on the current stage you are in in localdb t
 
 # Cold Tests
 
-The following procedures apply to both Post-Parylene Warm and Final Warm stages.
+The following procedures apply to both Post-Parylene Cold and Final Cold stages.
 
 The first set of tests are performed at -15$^\circ$C.
 
@@ -509,7 +524,7 @@ The goal of the injection capacitance is to cross-check and update the injection
 
 To check if the measurement fails we can run the analysis script that will return a True or False value.
 
-    mqat analysis vcal-calibration 
+    mqat analysis injection-capacitance 
     -i outputs/[SN]/Measurements/INJECTION_CAPACITANCE/[time]
 
 The time that included in the script is displayed after the measurement has been ran. After seeing that the test passed you can upload to local database by running this script.
@@ -531,7 +546,7 @@ The goal of the data transmission is to data-link quality is sufficient for oper
 
 To check if the measurement fails we can run the analysis script that will return a True or False value.
 
-    mqat analysis vcal-calibration -i outputs/[SN]/Measurements/DATA_TRANSMISSION/[time]
+    mqat analysis data-transmission -i outputs/[SN]/Measurements/DATA_TRANSMISSION/[time]
 
 The time that included in the script is displayed after the measurement has been ran. After seeing that the test passed you can upload to local database by running this script.
 
@@ -558,8 +573,8 @@ To check if the test passed, go to localdb, go to the page of one of the front e
 
 Before the tuning preformance the chip configuration files must be cleared. This can be done by running the following script.
 
-    Yarr/scripts/clear_chip_config.py --input-dir outputs/DATA_TRANSMISSION/[time] 
-    -config-dir outputs/[SN] --config-type [layer]_cold
+    python Yarr/scripts/clear_chip_config.py -c 
+    outputs/[SN]/[SN]_[layer]_[stand].json
 
 ### Tuning Performance
 
@@ -570,18 +585,20 @@ The tuning performance test is to check that a tuning was overall successful and
 
 To check if the test passed, go to localdb, go to the page of one of the front end chips on the module that is being tested. Once there and you are signed into pixdaq on localdb scroll down to tuning performance and click \"Checkout Scans\", then you will select the most recent YARR Scan based on the date it was ran or the highest YARR Scan Run Number. Click the checkbox that says \"Use the same set of YARR scans for the rest FE Chips of the module\" so that you don't have to repeat the previous steps for the other FE chips. After clicking proceed, the test will be analyzed and the results will be available at the main page of the FE chip.
 
-### Pixel Failure Test
+### Pixel Failure Analysis
 
 Pixel Failure Test is the last test that is ran after tuning the chip because the chip can report untuned pixels as failing. This test will run a series of scans to determine if pixels are digital dead, digital bad, analog dead, analog bad, and noisy pixels.
 
     mqt yarr pfa -c config_epsilon.json -o outputs/[SN]/
     -m outputs/[SN]/[SN]_[layer]_cold.json  --use-pixel-config -tag PFA 
 
+### Source Scan
+
 **This next test will only be done in the Final Cold stage and only be done by those who have radiation safety training.**\
 If you need radiation safety training please contact Jason Nielsen.\
 While wearing wearing gloves grab a radiation source from the vault that has radiation warnings on it that is underneath the visual inspection table. Open the larger acrylic lid on the setup and place the source on top of the secondary acrylic lid in the square cut out above the foam box. Place the larger acrylic lid back onto the setup and then set the high voltage to 120 V by running the set hv script on multivisor for the specific setup you are working on. Start the source scan by running the following script.
 
-    mqt yarr scan -scan ‘selftrigger_source.json’ -tag PFA -c config_epsilon.json 
+    mqt yarr scan -scan ‘selftrigger_source.json’ -tag PFA -c config_[stand].json 
     -o outputs/[SN]/-m outputs/[SN]/[SN]_[layer]_cold.json  
 
 To check if the test passed, go to localdb, go to the page of one of the front end chips on the module that is being tested. Once there and you are signed into pixdaq on localdb scroll down to pixel failure analysis and click \"Checkout Scans\", then you will select the most recent YARR Scan based on the date it was ran or the highest YARR Scan Run Number. Click the checkbox that says \"Use the same set of YARR scans for the rest FE Chips of the module\" so that you don't have to repeat the previous steps for the other FE chips. After clicking proceed, the test will be analyzed and the results will be available at the main page of the FE chip. If the test passed, while wearing gloves, open the larger acrylic lid and put the source back into the radiation source vault.
@@ -590,7 +607,38 @@ If the test passed locally sign off on the current module stage in localdb this 
 
 # Thermal Cycling
 
-While the chiller is currently on and below -10$^\circ$C and module is powered off and at 25$^\circ$C run the following script to start the thermal cycle.
+Thermal cycling usually takes about 8 hours to complete and will be ran overnight between post parylene warm and final warm electrical qc tests.
+
+Thermal cycling can be started when the following conditions are met:
+
+-   the module is in the thermal cycling stage in localdb
+
+-   chiller running below -10$^\circ$C
+
+-   meerstetter running and stable at 20$^\circ$C
+
+-   module is powered off
+
+Thermal cycling can be started from the following command:
+
+    [stand]-thermal-cycle-start
+
+If the script does not change the meerstetter status from ready to run in grafana. Stop the thermal cycling and start it again. The script to stop thermal cycling is:
+
+    alpha-thermal-cycle-stop
+
+While the module is cooling down to -55$^\circ$C the meerstetter can fail. If it does, reset the meerstetter and then try again until it stabilizes at -55$^\circ$C. At this point you can leave it to run overnight.\
+In the morning when you come back in, disable and reset the meerstetter, and then stop the chiller. It is possible that the chiller valves have become frosted over from running over night, to get the ice off, set the chiller to +20$^\circ$C and then start it, within 30 minutes the ice on the chiller valves will start to fall off, and you can manually take it off yourself.
+
+Check grafana that during the thermal cycling state (this will be visible under the \"Meerstetter NTC (Module) Temperature\" visualization) that the temperature did one extreme cycle, and 10 cycles. The extreme cycle is from -55$^\circ$C to 25$^\circ$C, and the normal cycle is from -45$^\circ$C to 40$^\circ$C.
+
+An example of the module temperature during a good thermal cycling can be seen in Fig [16](#fig:thermalcycle){reference-type="ref" reference="fig:thermalcycle"}.
+
+![Example of a successful thermal cycling with one extreme cycle and 10 cycles.](Figures/thetmalcyclegood.png){#fig:thermalcycle width=".5\\linewidth"}
+
+If everything looks okay it can be uploaded to localdb using the manual input feature in the thermal cycling stage for that module. An example of how this was uploaded is shown in Fig [17](#fig:thermal-cycle-manual-input){reference-type="ref" reference="fig:thermal-cycle-manual-input"} where the start date/time and end date/time are determined from the grafana thermal cycling state variable mentioned earlier.
+
+![Example of manual data input for thermal cycling. ](Figures/theramal_cycle_data_input.png){#fig:thermal-cycle-manual-input width="0.75\\linewidth"}
 
 # Resetting the meerstetter {#sec:meerstetter}
 
@@ -604,22 +652,20 @@ The following are common error codes that you may encounter.
   108          Output Stage saturation error.       Interlock turned off meerstetter power
   138          Measured object temperature out of   Module got too hot when turned on.
                permitted range                      
-  139          Change in measured object            Module got too hot too fast when
-               temperature too fast (outpacing      turned on.
+  139          Change in measured object            Module got hot or cold too fast when
+               temperature too fast (outpacing      turned on or off.
                thermal inertia)                     
 
   : Common meerstetter error codes.
 :::
 
-To reset the interlock follow these steps, the commands for each step can be found in Table [4](#tab:commands){reference-type="ref" reference="tab:commands"}.
+To reset the meerstetter follow these steps, the commands for each step can be found in Table [4](#tab:commands){reference-type="ref" reference="tab:commands"}.
 
--   Disarm the interlock if it hasn't already been tripped.
+-   if the meerstetter is still running, disable it, otherwise continue to next step
 
--   Reset the meerstetter.
+-   reset the meerstetter
 
--   Disable the meerstetter.
-
--   Rearm interlock.
+-   initiate the meerstetter
 
 # Rearming the interlock {#sec:interlock}
 
@@ -653,8 +699,9 @@ The following commands can be run in a daq-05 terminal.
   Rearming the interlock                 \[stand\]-interlock-rearm
   Turning on chiller                     chiller-on-\[chiller\]
   Turning off chiller                    chiller-off-\[chiller\]
-  Resetting meerstetter                  \[stand\]-meerstetter reset
   Disabling meerstetter                  \[stand\]-meerstetter disable
+  Resetting meerstetter                  \[stand\]-meerstetter reset
+  Initiating meerstetter                 \[stand\]-meerstetter init
   Setting peltier temperature            \[stand\]-meerstetter to_temp \[temp\]
 
   : Table of commands and their action.
